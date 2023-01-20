@@ -83,6 +83,9 @@ class ViewController: UIViewController {
     }
     
     fileprivate func computeResult(_ a: String, _ op: String, _ b: String) -> String {
+        if (a == "Error" || b == "Error") {
+            return "Error"
+        }
         let nb1 = Double(a.replacingOccurrences(of: ",", with: "."))!
         let nb2 = Double(b.replacingOccurrences(of: ",", with: "."))!
         var result = ""
@@ -98,7 +101,11 @@ class ViewController: UIViewController {
             result = String(nb1 * nb2).replacingOccurrences(of: ".", with: ",")
             break
         case "/":
-            result = String(nb1 / nb2).replacingOccurrences(of: ".", with: ",")
+            if (nb2 == 0) {
+                result = "Error"
+            } else {
+                result = String(nb1 / nb2).replacingOccurrences(of: ".", with: ",")
+            }
             break
         default:
             break
