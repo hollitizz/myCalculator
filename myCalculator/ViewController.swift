@@ -140,11 +140,17 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onNumberButtonPress(_ sender: UIButton) {
+        if (is_displaying_a_result) {
+            number = "0"
+            memory = "0"
+        }
         is_displaying_a_result = false
         old_number = ""
         old_operator = ""
-        choosen_operator = selected_operator
-        selected_operator = ""
+        if (selected_operator != "") {
+            choosen_operator = selected_operator
+            selected_operator = ""
+        }
         if (number == "0" && sender.configuration!.title! != ",") {
             number = ""
         } else if (number == "-0" && sender.configuration!.title! != ",") {
