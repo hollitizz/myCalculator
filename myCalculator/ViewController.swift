@@ -142,7 +142,7 @@ class ViewController: UIViewController {
     @IBAction func onNumberButtonPress(_ sender: UIButton) {
         if (is_displaying_a_result) {
             number = "0"
-            memory = "0"
+            memory = ""
         }
         is_displaying_a_result = false
         old_number = ""
