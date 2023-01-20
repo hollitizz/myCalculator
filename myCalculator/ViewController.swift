@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     var old_operator = ""
     
     var selected_operator = ""
+    
+    var choosen_operator = ""
 
     var is_displaying_a_result = false
     
@@ -37,8 +39,9 @@ class ViewController: UIViewController {
     fileprivate func updateUI() {
         memory_label.text = "\(memory)"
         memory_label.text! += (memory != "" && selected_operator != "") ? " \(selected_operator)" : ""
+        memory_label.text! += (memory != "" && choosen_operator != "") ? " \(choosen_operator)" : ""
         if (is_displaying_a_result) {
-            memory_label.text! += " \(old_operator) \(old_number) ="
+            memory_label.text! = "\(memory) \(old_operator) \(old_number) ="
         }
         number_label.text = number
         if (number != "0") {
@@ -65,15 +68,17 @@ class ViewController: UIViewController {
     @IBAction func onPercentageButton(_ sender: UIButton) {
         let nb1 = Double(number.replacingOccurrences(of: ",", with: "."))!
         number = String(nb1 / 100)
-        print(number)
         updateUI()
     }
     
     @IBAction func onOperationButtonPressed(_ sender: UIButton) {
-        is_displaying_a_result = false
+        if (memory != "") {
+            number = computeResult(memory, choosen_operator, number)
+            choosen_operator = ""
+        }
+        selected_operator = sender.configuration!.title!
         memory = number
         number = "0"
-        selected_operator = sender.configuration!.title!
         updateUI()
     }
     
@@ -98,7 +103,7 @@ class ViewController: UIViewController {
         default:
             break
         }
-        while (result.last == "0" || result.last == ",") {
+        while ((result.last == "0" || result.last == ",") && result.contains(",")) {
             result.removeLast()
         }
         return result
@@ -106,16 +111,18 @@ class ViewController: UIViewController {
     
     @IBAction func onEqualButtonPressed(_ sender: UIButton) {
         var result = ""
+
         if (memory == "" && old_number == "") {
             return
         }
-        if (memory == "" && old_number != "") {
+        if (old_number != "") {
             result = computeResult(number, old_operator, old_number)
+            memory = number
         } else {
-            result = computeResult(memory, selected_operator, number)
+            result = computeResult(memory, choosen_operator, number)
             old_number = number
-            old_operator = selected_operator
-            selected_operator = ""
+            old_operator = choosen_operator
+            choosen_operator = ""
         }
         number = result
         is_displaying_a_result = true
@@ -136,6 +143,8 @@ class ViewController: UIViewController {
         is_displaying_a_result = false
         old_number = ""
         old_operator = ""
+        choosen_operator = selected_operator
+        selected_operator = ""
         if (number == "0" && sender.configuration!.title! != ",") {
             number = ""
         } else if (number == "-0" && sender.configuration!.title! != ",") {
