@@ -9,6 +9,10 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    let origin_number_label_size = 70
+    
+    let origin_memory_label_size = 40
+    
     var memory = ""
     
     var number = "0"
@@ -23,6 +27,8 @@ class ViewController: UIViewController {
 
     var is_displaying_a_result = false
     
+    @IBOutlet var top_view: UIView!
+
     @IBOutlet var memory_label: UILabel!
     
     @IBOutlet var number_label: UILabel!
@@ -36,14 +42,48 @@ class ViewController: UIViewController {
         updateUI()
     }
 
+    fileprivate func separateNumbers(_ str: String) -> String {
+        var is_neg = false
+        var editable_str = str
+        var dest_str = ""
+
+        if (str.first == "-") {
+            is_neg = true
+            editable_str.removeFirst()
+        }
+        for (i, nbr) in editable_str.reversed().enumerated() {
+            if ((i) % 3 == 0) {
+                dest_str = "\(nbr) \(dest_str)"
+            } else {
+                dest_str = "\(nbr)\(dest_str)"
+            }
+        }
+        if (is_neg) {
+            dest_str = "-\(dest_str)"
+        }
+        return dest_str
+    }
+    
+    fileprivate func fitLabelInView(label: UILabel, view: UIView) {
+        label.sizeToFit()
+        while label.frame.width > view.frame.width - 20 {
+            label.font = label.font.withSize(label.font.pointSize - 5)
+            label.sizeToFit()
+        }
+    }
+
     fileprivate func updateUI() {
-        memory_label.text = "\(memory)"
+        number_label.font = number_label.font.withSize(CGFloat(origin_number_label_size))
+        memory_label.font = number_label.font.withSize(CGFloat(origin_memory_label_size))
+        memory_label.text = "\(separateNumbers(memory))"
         memory_label.text! += (memory != "" && selected_operator != "") ? " \(selected_operator)" : ""
         memory_label.text! += (memory != "" && choosen_operator != "") ? " \(choosen_operator)" : ""
         if (is_displaying_a_result) {
-            memory_label.text! = "\(memory) \(old_operator) \(old_number) ="
+            memory_label.text! = "\(separateNumbers(memory)) \(old_operator) \(separateNumbers(old_number)) ="
         }
-        number_label.text = number
+        number_label.text = separateNumbers(number)
+        fitLabelInView(label: memory_label, view: top_view)
+        fitLabelInView(label: number_label, view: top_view)
         if (number != "0") {
             reset_button.configuration!.title! = "C"
         } else {
@@ -167,6 +207,15 @@ class ViewController: UIViewController {
             number += sender.configuration!.title!
         }
         updateUI()
+    }
+    @IBAction func onLeftSwipe(_ sender: UIPanGestureRecognizer) {
+        if (sender.velocity(in: top_view).x < -25 && sender.state == .ended) {
+            number.removeLast()
+            if (number == "") {
+                number = "0"
+            }
+            updateUI()
+        }
     }
     
 }
